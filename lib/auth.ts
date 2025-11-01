@@ -19,6 +19,14 @@ export function removeToken() {
   localStorage.removeItem('userData');
   // Remove cookie
   document.cookie = 'token=; path=/; max-age=0';
+  
+  // Dispatch custom event so components can react
+  // Use setTimeout to avoid dispatching during render
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('tokenRemoved'));
+    }, 0);
+  }
 }
 
 // Decode JWT
@@ -40,14 +48,34 @@ export function isTokenExpired(token: string): boolean {
 
 // Get current user from token
 export function getCurrentUser(): User | null {
+  if (typeof window === 'undefined') return null;
+  
   const token = getToken();
-  if (!token || isTokenExpired(token)) {
+  if (!token) {
+    removeToken(); // Clean up any stale userData
+    return null;
+  }
+  
+  // Check if token is expired
+  if (isTokenExpired(token)) {
+    console.log('⚠️ Token expired in getCurrentUser(), removing...');
     removeToken();
     return null;
   }
   
   const userData = localStorage.getItem('userData');
-  return userData ? JSON.parse(userData) : null;
+  if (!userData) {
+    // Token exists but no userData - something is wrong
+    removeToken();
+    return null;
+  }
+  
+  try {
+    return JSON.parse(userData);
+  } catch {
+    removeToken();
+    return null;
+  }
 }
 
 // Check user role

@@ -76,27 +76,12 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 pt-24">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Chọn gói đăng ký phù hợp</h1>
           <p className="text-lg text-gray-600">Nâng cấp tài khoản để đăng tin không giới hạn</p>
         </div>
-
-        {/* Login Notice for Guest Users */}
-        {mounted && !user && (
-          <div className="max-w-2xl mx-auto mb-12 bg-yellow-50 border-2 border-yellow-200 rounded-lg shadow-lg p-6">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">ℹ️</span>
-              <div>
-                <h3 className="text-lg font-semibold mb-1">Bạn chưa đăng nhập</h3>
-                <p className="text-gray-600">
-                  Vui lòng <Link href="/login" className="text-blue-600 font-semibold hover:underline">đăng nhập</Link> để mua gói đăng ký
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Current Subscription */}
         {mySubscription && (

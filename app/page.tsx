@@ -39,7 +39,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 pt-[80px]">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl p-12 mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">

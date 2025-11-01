@@ -7,10 +7,11 @@ import { useState, useEffect } from 'react';
 
 export default function SubscriptionPromoBanner() {
   const pathname = usePathname();
-  const [user, setUser] = useState(getCurrentUser());
+  const [user, setUser] = useState<any>(null); // Don't call getCurrentUser in render
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
+    // Get user in useEffect to avoid calling getCurrentUser during render
     setUser(getCurrentUser());
   }, [pathname]);
 

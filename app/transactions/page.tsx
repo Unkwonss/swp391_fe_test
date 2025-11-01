@@ -33,18 +33,32 @@ interface Payment {
 
 export default function TransactionsPage() {
   const router = useRouter();
-  const [user, setUser] = useState(getCurrentUser());
+  const [user, setUser] = useState<any>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    const currentUser = getCurrentUser();
+    setUser(currentUser);
+    if (!currentUser) {
       router.push('/login');
       return;
     }
-    loadPayments();
-  }, [user, router]);
+    
+    // Load payments inline to avoid dependency issues
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await getAllPaymentsByUser(currentUser.userID);
+        setPayments(data);
+      } catch (error) {
+        console.error('Failed to load payments:', error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [router]);
 
   const loadPayments = async () => {
     if (!user) return;

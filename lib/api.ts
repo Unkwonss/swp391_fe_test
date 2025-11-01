@@ -1,11 +1,19 @@
 import { Listing, PageResponse, Subscription, UserSubscription, Review, Report, Payment } from './types';
-import { getToken } from './auth';
+import { getToken, isTokenExpired, removeToken } from './auth';
 
 const API_URL = 'http://localhost:8080/api';
 
 // Helper function
 async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
+  
+  // ✅ Check if token is expired BEFORE making request
+  if (token && isTokenExpired(token)) {
+    console.warn('⚠️ Token expired during API call, removing...');
+    removeToken();
+    throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+  }
+  
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
@@ -21,6 +29,13 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
   });
 
   if (!res.ok) {
+    // Check if 401 Unauthorized (token invalid on backend)
+    if (res.status === 401) {
+      console.warn('⚠️ 401 Unauthorized - token invalid, removing...');
+      removeToken();
+      throw new Error('Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
+    }
+    
     const error = await res.text();
     throw new Error(error || `API Error: ${res.status}`);
   }

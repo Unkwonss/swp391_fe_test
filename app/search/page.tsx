@@ -10,7 +10,7 @@ import type { Listing } from '@/lib/types';
 export default function SearchPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(getCurrentUser());
+  const [user, setUser] = useState<any>(null);
 
   const [filters, setFilters] = useState({
     keyword: '',
@@ -20,6 +20,7 @@ export default function SearchPage() {
   });
 
   useEffect(() => {
+    setUser(getCurrentUser());
     handleSearch();
   }, []);
 

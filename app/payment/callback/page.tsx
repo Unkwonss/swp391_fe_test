@@ -22,33 +22,24 @@ function PaymentResultContent() {
 
   const checkPaymentResult = async () => {
     try {
-      const responseCode = searchParams.get('vnp_ResponseCode');
-      const orderId = searchParams.get('vnp_TxnRef');
-      const amount = searchParams.get('vnp_Amount');
-      const transactionNo = searchParams.get('vnp_TransactionNo');
-
-      if (!responseCode) {
-        setResult({
-          success: false,
-          message: 'Không tìm thấy thông tin thanh toán'
-        });
-        setChecking(false);
-        return;
+      // Gọi backend /api/vnpay/return để verify signature và update DB
+      const params = new URLSearchParams(searchParams.toString());
+      const response = await fetch(`http://localhost:8080/api/vnpay/return?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to verify payment');
       }
 
-      // VNPay response codes:
-      // 00: Success
-      // Others: Failed
-      const isSuccess = responseCode === '00';
+      const data = await response.json();
 
       setResult({
-        success: isSuccess,
-        message: isSuccess 
+        success: data.success,
+        message: data.success 
           ? 'Thanh toán thành công! Gói đăng ký của bạn đã được kích hoạt.' 
-          : 'Thanh toán thất bại. Vui lòng thử lại.',
-        orderId: orderId || undefined,
-        amount: amount ? parseInt(amount) / 100 : undefined,
-        transactionNo: transactionNo || undefined,
+          : data.message || 'Thanh toán thất bại. Vui lòng thử lại.',
+        orderId: data.orderId,
+        amount: data.amount,
+        transactionNo: data.transactionNo,
       });
     } catch (error) {
       console.error('Failed to check payment:', error);

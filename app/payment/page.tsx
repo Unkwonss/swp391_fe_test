@@ -8,7 +8,7 @@ import { createVNPayPayment, cancelPayment } from '@/lib/api';
 function PaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [user, setUser] = useState(getCurrentUser());
+  const [user, setUser] = useState<any>(null);
   const [processing, setProcessing] = useState(false);
   const [pendingPaymentModal, setPendingPaymentModal] = useState<any>(null);
 
@@ -17,10 +17,12 @@ function PaymentContent() {
   const name = searchParams.get('name');
 
   useEffect(() => {
-    if (!user) {
+    const currentUser = getCurrentUser();
+    setUser(currentUser);
+    if (!currentUser) {
       router.push('/login');
     }
-  }, [user, router]);
+  }, [router]);
 
   const handleCancelPendingPayment = async () => {
     if (!pendingPaymentModal) return;

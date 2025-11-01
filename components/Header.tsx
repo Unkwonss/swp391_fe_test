@@ -13,7 +13,28 @@ export default function Header() {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
+    // Update user on mount and pathname change
     setUser(getCurrentUser());
+
+    // Listen for storage changes (when token is removed in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token' || e.key === 'userData') {
+        setUser(getCurrentUser());
+      }
+    };
+
+    // Listen for custom tokenRemoved event (same tab)
+    const handleTokenRemoved = () => {
+      setUser(null);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('tokenRemoved', handleTokenRemoved);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('tokenRemoved', handleTokenRemoved);
+    };
   }, [pathname]);
 
   const handleLogout = () => {
